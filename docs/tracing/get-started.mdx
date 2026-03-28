@@ -14,6 +14,10 @@ Create API Keys either with [TraceRoot Cloud](https://app.traceroot.ai) or [Self
 pip install traceroot
 ```
 
+```bash npm
+npm install traceroot-sdk-ts
+```
+
 ```bash uv
 uv add traceroot
 ```
@@ -45,7 +49,7 @@ traceroot.initialize(integrations=[Integration.OPENAI])
 client = OpenAI()
 ```
 
-For full SDK details, see the [Python SDK](/tracing/python-sdk).
+For full SDK details, see the [Python SDK](/tracing/python-sdk) or the [TypeScript SDK](/tracing/typescript-sdk).
 
 ## 5. View Your Traces
 
@@ -58,6 +62,9 @@ Open [TraceRoot Cloud](https://app.traceroot.ai) (or your self-hosted dashboard)
 <CardGroup cols={2}>
   <Card title="Python SDK" icon="code" href="/tracing/python-sdk">
     Full API reference for decorators, spans, and configuration.
+  </Card>
+  <Card title="TypeScript SDK" icon="code" href="/tracing/typescript-sdk">
+    Node.js SDK for wrappers, context propagation, and OpenInference integrations.
   </Card>
   <Card title="AI Agent" icon="brain" href="/ai-agent/overview">
     Auto-debug failing traces with the built-in AI agent.

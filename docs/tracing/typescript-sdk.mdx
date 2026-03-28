@@ -1,0 +1,112 @@
+---
+title: TypeScript SDK
+description: Installation, initialization, and API reference for the TraceRoot TypeScript Node.js SDK
+---
+
+The TraceRoot TypeScript SDK provides manual instrumentation for Node.js applications plus optional auto-instrumentation for OpenAI, Anthropic, and LangChain via OpenInference.
+
+## Installation
+
+```bash
+npm install traceroot-sdk-ts
+```
+
+## Instrumentation
+
+```ts
+import { initialize, Integration } from "traceroot-sdk-ts";
+
+initialize({
+  integrations: [
+    Integration.OPENAI,
+    Integration.ANTHROPIC,
+    Integration.LANGCHAIN,
+  ],
+});
+```
+
+## Observing Functions
+
+In TypeScript, the most portable pattern is wrapping a function with `observe`.
+
+```ts
+import { observe } from "traceroot-sdk-ts";
+
+const myFunction = observe(
+  async function myFunction(query: string) {
+    return doWork(query);
+  },
+  { name: "my_function", type: "tool" },
+);
+```
+
+It can also be used as a class method decorator when your project already supports decorators.
+
+## Setting Trace Context
+
+Use `usingAttributes` to attach user, session, tags, and metadata across nested spans:
+
+```ts
+import { usingAttributes } from "traceroot-sdk-ts";
+
+await usingAttributes(
+  {
+    userId: "user-123",
+    sessionId: "sess-456",
+    tags: ["production"],
+    metadata: { region: "us-east-1" },
+  },
+  async () => {
+    await myFunction("hello");
+  },
+);
+```
+
+## Updating Spans and Traces
+
+```ts
+import { updateCurrentSpan, updateCurrentTrace } from "traceroot-sdk-ts";
+
+updateCurrentSpan({
+  name: "custom_name",
+  input: { query: "hello" },
+  output: { response: "world" },
+  metadata: { customKey: "customValue" },
+  model: "gpt-4o",
+  modelParameters: { temperature: 0.7, max_tokens: 1024 },
+  usage: { inputTokens: 100, outputTokens: 50 },
+  prompt: [{ role: "user", content: "hello" }],
+});
+
+updateCurrentTrace({
+  userId: "user-123",
+  sessionId: "sess-456",
+  tags: ["production", "v2"],
+});
+```
+
+## Environment Variables
+
+All core options can be configured with environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TRACEROOT_API_KEY` | (required for cloud export) | API key |
+| `TRACEROOT_HOST_URL` | `https://app.traceroot.ai` | API endpoint |
+| `TRACEROOT_ENABLED` | `true` | Enable or disable tracing |
+| `TRACEROOT_FLUSH_INTERVAL` | `5.0` | Flush interval in seconds |
+| `TRACEROOT_FLUSH_AT` | `100` | Batch size before flush |
+| `TRACEROOT_TIMEOUT` | `30.0` | HTTP timeout in seconds |
+| `TRACEROOT_GIT_REPO` | auto-detected | Git repository (`owner/repo`) |
+| `TRACEROOT_GIT_REF` | auto-detected | Git reference |
+
+## Shutdown
+
+Flush and shut down the SDK before process exit:
+
+```ts
+import { flush, shutdown } from "traceroot-sdk-ts";
+
+await flush();
+await shutdown();
+```
